@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 
 
+
 def read_txt(path, idx_2_landmark: dict):
     result = []
     count = 0
@@ -46,3 +47,6 @@ def pairwise_distance(data):
     result += y ** 2
     result += y.T ** 2
     return np.sqrt(result)
+
+
+
