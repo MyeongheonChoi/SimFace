@@ -30,6 +30,7 @@ class DAMConfig:
     dim_emb = 512
     scale = 1e-3
     num_class = 380
+    test_size = 30
 
 
 class DAMEstimateConfig:
@@ -39,7 +40,7 @@ class DAMEstimateConfig:
     num_class = train_cfg.num_class
     scale = train_cfg.scale
 
-    test_size = 100
+    test_size = 30
     batch_size = 64
     imple_id = 0
     epoch_id = 29
@@ -48,8 +49,9 @@ class DAMEstimateConfig:
 
 class ArcConfig:
     is_gray = True
-    train_path = 'data/gray_train_data.npz'
-    test_path = 'data/gray_test_data.npz'
+    test_size =30
+    train_path = 'data/kface_gray_train.npz'
+    test_path = 'data/kface_gray_test.npz'
     save_path = 'models/trained/Arc'
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -66,7 +68,7 @@ class ArcConfig:
     lr_decay = 0.95
     weight_decay = 5e-4
 
-    load_model_name = 'resnet_face18'
+    load_model_name = 'resnet_face100'
     if normalized:
         load_path = 'models/trained/Arc/' + load_model_name + '_normalized' + '.pth'
     else:
@@ -96,6 +98,7 @@ parser.add_argument('--cpu-mode', action='store_true', help='Use the CPU.')
 parser.add_argument('--device', default=device, action='store_true', help='Use the CPU.')
 parser.add_argument('--dist', default=1, help='use this if model is trained with dist')
 parser.add_argument('--is_gray', default=False, help='use this if model is trained with dist')
+parser.add_argument('--test_size', default=30, help='use this if model is trained with dist')
 mag_args = parser.parse_args()
 
 
@@ -105,6 +108,31 @@ class SiameseConfig:
     is_gray = True
 
 
+class CosConfig:
+    is_gray = True
+    test_size = 30
+    train_path = 'data/kface_gray_train.npz'
+    test_path = 'data/kface_gray_test.npz'
+    save_path = 'models/trained/Cos'
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+    backbone = 'resnet_face18'
+    normalized = True
+    batch_size = 64
+    num_classes = 400
+    use_se = True
+    easy_margin = False
+
+    max_epoch = 30
+    lr = 1e-1
+    lr_step = 6
+    lr_decay = 0.95
+    weight_decay = 5e-4
+
+    load_model_name = 'CosFace100'
+    load_path = f'models/trained/Cos/{load_model_name}.pth'
+
+
 def load_cfg(extractor_type: str):
     if extractor_type == 'Mag':
         return mag_args
@@ -112,6 +140,8 @@ def load_cfg(extractor_type: str):
         return ArcConfig()
     elif extractor_type == 'Norm':
         return DAMConfig()
+    elif extractor_type == 'Cos':
+        return CosConfig()
     else:
         return SiameseConfig()
 

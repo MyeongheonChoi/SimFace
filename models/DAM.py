@@ -68,9 +68,9 @@ class Extractor(nn.Module):
         return x
 
 
-class DAM(nn.Module):
+class Sims(nn.Module):
     def __init__(self, dim_emb, num_class, scale, dim_in=2048):
-        super(DAM, self).__init__()
+        super(Sims, self).__init__()
         self.layer1 = nn.Linear(dim_in, dim_emb)
         nn.init.xavier_normal(self.layer1.weight)
 
@@ -99,5 +99,5 @@ class DAM(nn.Module):
 
 
 def dam():
-    model_dam = DAM(cfg.dim_emb, cfg.num_class, cfg.scale).to(cfg.device)
+    model_dam = Sims(cfg.dim_emb, cfg.num_class, cfg.scale).to(cfg.device)
     return model_dam

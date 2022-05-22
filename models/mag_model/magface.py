@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import sys
 sys.path.append("..")
-from models import iresnet
+from models.mag_model  import iresnet
 from collections import OrderedDict
 from termcolor import cprint
 from torch.nn import Parameter
@@ -16,6 +16,10 @@ import os
 
 def builder(args):
     model = SoftmaxBuilder(args)
+    PATH = './magface_epoch_00025.pth'
+    checkpoint = torch.load(PATH)['state_dict']
+    del checkpoint['fc.weight']
+    model.load_state_dict(checkpoint, strict = False)
     return model
 
 
@@ -48,6 +52,9 @@ class SoftmaxBuilder(nn.Module):
         self.fc = MagLinear(args.embedding_size,
                             args.last_fc_size,
                             scale=args.arc_scale)
+        # self.fc = MagLinear(10718,
+        #                     args.last_fc_size,
+        #                     scale=args.arc_scale)
 
         self.l_margin = args.l_margin
         self.u_margin = args.u_margin

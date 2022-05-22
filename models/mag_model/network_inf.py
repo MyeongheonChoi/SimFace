@@ -1,6 +1,6 @@
+#!/usr/bin/env python
 import sys
 sys.path.append("..")
-
 
 from models.mag_model import iresnet
 from collections import OrderedDict

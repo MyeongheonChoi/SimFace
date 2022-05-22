@@ -74,6 +74,8 @@ class IResNet(nn.Module):
                              "or a 3-element tuple, got {}".format(replace_stride_with_dilation))
         self.groups = groups
         self.base_width = width_per_group
+        # 컬러 이미지로 학습할 때는 3으로, 흑백 이미지로 학습할 때는 1로
+        # inplane을 3에서 1로 바꿈.
         self.conv1 = nn.Conv2d(3, self.inplanes, kernel_size=3, stride=1, padding=1,
                                bias=False)
         self.bn1 = nn.BatchNorm2d(self.inplanes, eps=2e-05, momentum=0.9)
@@ -92,6 +94,7 @@ class IResNet(nn.Module):
         self.dropout = nn.Dropout2d(p=0.4, inplace=True)
         self.fc = nn.Linear(512 * block.expansion * self.fc_scale, num_classes)
         self.features = nn.BatchNorm1d(num_classes, eps=2e-05, momentum=0.9)
+        # self.fc2 = nn.Linear(512, 10718)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -142,8 +145,10 @@ class IResNet(nn.Module):
         x = self.bn2(x)
         x = self.dropout(x)
         x = x.view(x.size(0), -1)
-        x = self.fc(x)
+        
+        x = self.fc(x.detach())
         x = self.features(x)
+        # x = self.fc2(x)
 
         return x
 
@@ -154,6 +159,8 @@ def _iresnet(arch, block, layers, pretrained, progress, **kwargs):
     # state_dict = load_state_dict_from_url(model_urls[arch],
     #                                        progress=progress)
     # model.load_state_dict(state_dict)
+    
+    model = torch.nn.DataParallel(model)
     return model
 
 
